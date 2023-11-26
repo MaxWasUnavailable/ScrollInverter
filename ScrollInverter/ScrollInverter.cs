@@ -13,7 +13,49 @@ public class ScrollInverter : BaseUnityPlugin
     private bool _isPatched;
     private void Awake()
     {
-        // Plugin startup logic
+        // Set instance
+        Instance = this;
+        
+        // Init logger
+        Logger = base.Logger;
+        
+        // Patch using Harmony
+        PatchAll();
+        
+        // Report plugin is loaded
         Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+    }
+    
+    public void PatchAll()
+    {
+        if (_isPatched)
+        {
+            Logger.LogWarning("Already patched!");
+            return;
+        }
+        
+        Logger.LogDebug("Patching...");
+
+        _harmony = new Harmony(PluginInfo.PLUGIN_GUID);
+        _harmony.PatchAll();
+        _isPatched = true;
+        
+        Logger.LogDebug("Patched!");
+    }
+    
+    public void UnpatchAll()
+    {
+        if (!_isPatched)
+        {
+            Logger.LogWarning("Already unpatched!");
+            return;
+        }
+        
+        Logger.LogDebug("Unpatching...");
+
+        _harmony.UnpatchSelf();
+        _isPatched = false;
+        
+        Logger.LogDebug("Unpatched!");
     }
 }
